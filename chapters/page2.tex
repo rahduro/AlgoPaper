@@ -1,0 +1,42 @@
+\section{Previous Approaches}
+Previously most of the data structures for solving 1D-RMQ problem were based on the following structure that there exists and $O(N)$-bit structure (built with no more than $N$ comparisons), i.e. the cartesian tree \cite{p9}, such that a query can be answered in $O(1)$ without any comparison with input elements. But is has been shown by Demaine, Landau and Weimann \cite{p2}, it is impossible to generalize the Cartesian tree to higher dimensions.
+
+Gabow, Bentley and Tarjan \cite{p5}, first studied the RMQ problem in higher dimensions. They came up with an algorithm that uses dimensionality reduction to process a query recursively. The preprocessing complexity in their approach was $O(N\log^{d-1}N)$ time and space, and query can be answered in $O(\log^{d-1}N)$ time.
+
+In multi-dimensional array setting, Chazelle and Rosenberg \cite{p3} gave an algorithm for range sum in semi-group model $(S, +)$ using $M$ units of storage where dimension $d$ is fixed and \( d \leq \log_{14} M/N\). Their preprocessing time complexity is $O(M)$ and query can be answered in \(O(\alpha^{d}(M,N))\) where $\alpha$ is functional inverse of Ackermann's function \cite{p8}.
+
+Poon \cite{p6} gave a data structure for range max/min queries for $d$-dimensional OLAP datacubes, that can be build in $O((3n\log^*n)^d)$ time using $O((3n)^d)$ words. It can answer queries in $O(8^d)$ time.
+
+Amir et al. \cite{p7} gave an algorithm for $2$D RMQ where they precompute the solution for a small number of micro blocks, where the size of each micro block is $O(s^2)$ with $s = \log^{[k]} n \text{ and } n = \sqrt N$. Their algorithm uses $O(kN)$ space, preprocessing time $O(N\log^{[k+1]}N)$ where $k > 1$ and query time is $O(1)$.
+\section{New Approach}
+We would describe the new approach \cite{p10} in 1-D case for the sake of brevity. It will be explained in multi-dimension setting in full report. The core idea behind this algorithm is a structure with the following properties,
+\compress
+\begin{itemize} \topsep0pt \itemsep1pt \parskip0pt \parsep0pt
+  \item It does not need to completely capture the positions of all RMQ results, instead, it should be able to generate a constant number of candidates at the querying stage to compare.
+  \item It can be computed in linear time.
+\end{itemize}
+Like conventional range trees \cite{p1}, the input array \(A\) is divided into canonical intervals which can be subdivided recursively into two halves until the size of an interval becomes $0$. There are $2^{k}$ such intervals for size $n/2^{k}$ where \(0 \leq k \leq \log n\), therefore total no of intervals is $2n-1$. For each canonical interval \( I = [a, b] \) the two following entries are computed, for \( a \leq x \leq b \),
+\compress
+\begin{itemize} \topsep0pt \itemsep1pt \parskip0pt \parsep0pt
+  \item LeftMin\((I, x) = \min_{a \leq i \leq x \text{ and } i \in I} A[i] \)
+  \item RightMin\((I, x) = \min_{x \leq i \leq b \text{ and } i \in I} A[i] \)
+\end{itemize}
+So there are total $O(n\log n)$ entries to be computed. Now for some $ I = [a,b] = I_1 \cup I_2 $ where $ I_1 = [a,b] \text{ and } I_2 = [b+1, c] $ the following algorithm can compute the above two values,
+\compress
+\begin{itemize} \topsep0pt \itemsep1pt \parskip0pt \parsep0pt
+\item \( \text{LeftMin}(I, x) = \text{LeftMin}(I_1, x) \text{ if } x \in I_1 \)
+\item \( \text{LeftMin}(I, x) = \text{LeftMin}(I_1, b) + \text{LeftMin}(I_2, x) \text{ if } x \in I_2 \)
+\end{itemize}
+Now \( \text{LeftMin}(I_2, x) \) can be computed in $O(\log(c-b+1))\) time using binary search of \( \text{LeftMin}(I_1, b) \) in precomputed LeftMin structure of $I_2$. Similarly RightMin structure can also be computed. The number of comparisons in the above Merge\((I_1,I_2)\) step is bounded by \(2\lceil {\log(l/2+1)} \rceil \leq 2\log_2l\). So the total complexity of the pre-processing step is given by the recurrence \(H(n) = 2H(n/2) + 2\log n \), solving the recurrence we get \( H(n) \leq 4n \).
+
+Now a query RMQ\((A, q)\) where $q=[a,b]$ can be answered in $O(\log n)$ time by calling SolveQuery\(([1,n], q)\). Let's assume $I=[u,v]$, then following are the three cases
+\compress
+\begin{itemize} \topsep0pt \itemsep0pt \parskip0pt \parsep0pt
+  \item If $a=u$ then answer is LeftMin\((I, b)\) or if $b=v$ it is RightMin\((I, a)\)
+  \item If $I=I_1 \cup I_2$, and $q \subseteq I_1$ recursively call SolveQuery\((I_1, q)\) if $q \subseteq I_2$ call SolveQuery\((I_2, q)\)
+  \item If $q$ overlap with both $I_1$ and $I_2$ then answer is $\min{\{\text{RightMin}(I_1,a),\text{LeftMin}(I_2, b)\}}$
+\end{itemize}
+We can reduce query processing time to $O(1)$, by building an auxiliary tree $T$ where node $v_I$ denotes interval $I=I_1 \cup I_2$ and its children would be $v_{I_1}$ and $v_{I_2}$. Then a nearest common ancestor data structure can be built using any of the techniques presented in \cite{p4}, \cite{p13}, \cite{p16}, \cite{p15}. And now for any query \(q=[a,b]\) the nearest common ancestor of two canonical intervals \( [a,a] \text{ and } [b,b] \) in $T$ in constant time. And it is can surely be answered by either by first or last case of the above in constant time.
+
+For $d$-dimensional array it can be shown that the preprocessing requires $O((2.89)^d*(d+1)!)N$ comparisons and query can answered in $2^d-1$ using $d$ nearest common ancestor queries.
+

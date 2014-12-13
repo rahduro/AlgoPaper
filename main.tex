@@ -1,0 +1,41 @@
+\documentclass[11pt]{report}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage[margin=0.5in]{geometry}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{titlesec}
+\usepackage{url}
+\usepackage{amsmath,amsthm,enumitem,amsfonts}
+
+\makeatletter
+\newcommand*{\compress}{\@minipagetrue}
+\makeatother
+
+%\usepackage{biblatex}
+
+\titleformat{\chapter}{\Large\bfseries}{}{0pt}{\huge}
+\titlespacing*{\chapter}{0pt}{0pt}{5pt}
+\titleformat{\section}{\normalfont\bfseries}{}{0pt}{\large}
+\titlespacing{\section}{0pt}{12pt plus 4pt minus 2pt}{5pt plus 2pt minus 2pt}
+%\titlespacing{\subsection}{0pt}{12pt plus 4pt minus 2pt}{0pt plus 2pt minus 2pt}
+
+\title{Report on\\Data Structures for Range Minimum Queries in Multidimensional Arrays}
+\author{Chitradeep Dutta Roy, Zinnia Mukherjee}
+\date{1 November, 2014}
+
+\begin{document}
+
+\maketitle
+
+%\chapter{}
+\input{chapters/page1}
+
+%\chapter{}
+\input{chapters/page2}
+
+\newpage
+\bibliographystyle{plain}
+\bibliography{references}
+
+\end{document}

@@ -1,0 +1,23 @@
+\section{Problem Definition}
+This paper\cite{p10} addresses the problem of answering the range minimum query for higher dimensional arrays. Formally the range minimum query problem can be defined as follows:\par
+For a d-dimensional array A of size $N = n_1.n_2...n_k$, where $n_k$ is the length of the $k^{th}$ dimension, a d-dimensional range minimum query problem aks for the minimum element in the query range $q = [a_1, b_1]$ x $[a_2, b_2]$ x..x $[a_d, b_d]$, where $a_k$ and $b_k$ are the upper and lower indices of the $k^{th}$ dimension respectively.
+\begin{center}
+\begin{math}
+RMQ(A, q) = min A[q] = min_{(i_1,....,i_d)\in q}  A(i_1,....,i_d)
+\end{math}
+\end{center}
+\section{Result and its importance}
+This paper gives the first linear time and space preprocessing algorithm with constant query time for d-dimensional arrays where d is assumed to be fixed. In order to achieve this goal, new data structure has been proposed for which the following two conditions must be met:\par
+\begin{enumerate}
+\item It does not compute all the possible RMQ results at the preprocessing stage. Instead it allows the flexibility of comparisons and generating new results at the querying stage. This greatly reduces the number of types to linear.\par
+\item The encoding of the data structure can be computed in linear time.
+\end{enumerate}
+Their result can be stated as follows:\par
+For a d-dimensional array, $O((2.89)^d.(d+1)!)N)$ comparisons are sufficient to preprocess the input array and the querying stage requires O($2^d-1$) comparisons. Hence this gives a linear time preprocessing and constant time querying for higher dimensional arrays where d is assumed to be fixed. When this scheme is implemented under the RAM model with a fixed dimension, the querying time is increased to $O(3^d)$, which is still a constant, while the preprocessing time remains the same.\par
+The RMQ problem for higher dimensional problems have been studied before and this paper made a major breakthrough by extending the 1D RMQ problem to higher dimensional arrays while preserving the linear time preprocessing and constant time querying features. The intial thought was to compute cartesian tree like structures in linear time which can also capture all possible RMQ results.\par
+In fact, it was proved by Demaine, Landau and Weimann\cite{p2} that there is no such possible cartesian tree like structure in 2D case.
+The results are fascinating since this builds upon the concept provided by Demaine et al. Their new idea of allowing constant time comparison at the querying stage changed the requirement of cartesian tree like structures. The main point of difference of their data structure with a cartesian tree is that while the latter requires to get range minimum without any comparison at the querying stage, their data structure allows a constant number of candidates to be compared at the querying stage. Many new research papers\cite{p14,p11,p12} have implemented this novel technique to come up with better query results in their specific domain.
+\section{Impact of the results}
+The range minimum query problem has direct impact in several fields related to string pattern matching, text compression, genomic sequence analysis in computational biology and image  processing. It also has applications in OLAP databases where multidimensional range min/max queries are used extensively.\par
+Recently Brodal et al.\cite{p11} proposed a space efficient indexing data structure for two-dimensional RMQ problems that improves upon the $O(NlogN)$ bits or $O(N)$ words data structure proposed in this paper. Their paper uses the concept of Fibonacci lattice that has applications in the field of graphics and image processing. The paper by Mitzi et al.\cite{p12} explores the problem of expensive updating of prefix sum cubes for OLAP range queries on flash memory. This is based upon the theoretical research work being done on developing efficient data structures and algorithms that focus on range query computations for a given set of dimensions. Farzan et al. \cite{p14} presented a fully compressed representation of a set of m points on an $n$x$n$ grid that uses encoding in higher dimensions. This is again inspired by Yuan's contribution.
+
