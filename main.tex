@@ -1,16 +1,25 @@
 \documentclass[11pt]{report}
 \usepackage[utf8]{inputenc}
 \usepackage{graphicx}
+\usepackage{float}
+\usepackage{subfig}
 \usepackage[margin=0.5in]{geometry}
-\usepackage{caption}
-\usepackage{subcaption}
+%\usepackage{caption}
+%\usepackage{subcaption}
 \usepackage{titlesec}
 \usepackage{url}
 \usepackage{amsmath,amsthm,enumitem,amsfonts}
+\usepackage{mathtools}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
 
 \makeatletter
 \newcommand*{\compress}{\@minipagetrue}
 \makeatother
+
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
 
 %\usepackage{biblatex}
 
@@ -22,7 +31,7 @@
 
 \title{Report on\\Data Structures for Range Minimum Queries in Multidimensional Arrays}
 \author{Chitradeep Dutta Roy, Zinnia Mukherjee}
-\date{1 November, 2014}
+\date{15 December, 2014}
 
 \begin{document}
 
@@ -30,10 +39,22 @@
 
 %\chapter{}
 \input{chapters/page1}
-
+\newpage
 %\chapter{}
 \input{chapters/page2}
-
+%\newpage
+\input{chapters/page3}
+%\newpage
+\input{chapters/page4}
+%\newpage
+\input{chapters/page5}
+%\newpage
+\input{chapters/page6}
+%\newpage
+\input{chapters/page7}
+%\newpage
+\input{chapters/page8}
+\input{chapters/page9}
 \newpage
 \bibliographystyle{plain}
 \bibliography{references}

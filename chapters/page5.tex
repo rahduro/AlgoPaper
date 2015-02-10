@@ -1,0 +1,47 @@
+\section{RMQ in Higher Dimensions ($d > 2$)}
+
+\section{Preprocessing Stage}
+\compress
+\begin{itemize}\topsep0pt \itemsep1pt \parskip0pt \parsep0pt
+\item Build the canonical interval set for each dimension $1 \leq k \leq d$. Let's call it $CIS_k$ for the $k^{th}$ dimension $[1..n_k]$. Let's denote the set of canonical ranges by $CR = \prod\limits_{k=1}^d CIS_k$.
+\item Now within each range $r$ precompute the following data structure for $x \in r$. \[DominanceMin(r,{\bf u},{\bf x}] = \min_{i \in r \cap Dom({\bf x}, {\bf u})} A[i] \]
+Now this is the generalization of $2D$ case, here ${\bf u} \in \{-1,1\}^d$ signifies direction. ${\bf i}$ is a $d$-length vector and $Dom({\bf x}, {\bf u})$ is a vector ${\bf p}$ that satisfies $u_k(p_k-x_k) \geq 0$ where $1\leq k\leq d$.
+\end{itemize}
+\section{Speeding up DominanceMin Structure computation}
+Similar to $2D$ case, dynamic programming is used to speed up the computation with the following considerations
+\compress
+\begin{itemize}\topsep0pt \itemsep1pt \parskip0pt \parsep0pt
+\item Sort the canonical ranges
+\item During bottom-up merging choose the longest-length dimension ($l=\max_{1\leq k\leq d}\left\vert I_k\right\vert$) for the binary search.
+\end{itemize}
+The number of comparisons for a range $r=I_1\times I_2\times\ldots xI_d$ becomes $2^d\left\vert r\right\vert\frac{\log l}{l}$.
+\section{Query Stage}
+As for $2D$ a query could be decomposed to $4$ subqueries, here it can be decomposed to $2^d$ subqueries. The subquery can be answered directly from $DominanceMin$ structures that are precomputed. A subquery can be identified by $d$ nearest common ancestor queries.
+
+\begin{theorem}[Preprocessing Complexity]
+The algorithm preprocesses a $d$-dimensional array in at most $B(d)N$ comparisons, where $B(d)=\mathcal{O}((2.89)d\cdot(d+1)!)$
+\end{theorem}
+\emph{Proof:} Let $R(l)$ and $R'(l)$ be $CR$s with the longest dimension at \emph{most} and \emph{exactly} $l=2^j$ for some $j$ respectively. Then we have the following
+\begin{align}
+\label{rl}
+R'(l)=R(l)\setminus R(l/2)
+\end{align}\par
+Let $P'_0(l)$ and $P'(l)$ be the total no of comparisons for building $DominanceMin$ structure of $R'(l)$ using naive ($2^d\left\vert r\right\vert$) and binary search ($2^d\left\vert r\right\vert\frac{\log l}{l}$) approach respectively. Similarly let $P_0(l)$ and $P(l)$ be the total no of comparisons for building $DominanceMin$ structure of $R(l)$ using naive and efficient merging algorithm. Because there are $\prod_{1\leq k\leq d}\frac{n_k}{2^{j_k}}$ $CR$s of size $2^{j_1}\times 2^{j_2}\ldots \times 2^{j_d}$ and each brute-force merging costs $2^d\prod_{1\leq k\leq d}2^{j_k}$ comparisons the following can be derived
+\begin{align}
+\label{pl}
+P_0(l)&=2^d\prod\limits_{1\leq k\leq d}\;\sum\limits_{0\leq j\leq \log l}\frac{n_k}{2^j}\cdot2^j=2^d\prod\limits_{1\leq k\leq d}((1+\log l)\cdot n_k)=2^d(1+\log l)^dN\\
+\label{p'l}
+P'_0(l)&=P_0(l)-P_0(l/2) \leq P_0(l) \hspace{233pt}\text { from equation \eqref{rl}}\\
+\label{lgl}
+P'(l)&=\frac{\log l}{l}P'_0(l) \hspace{160pt}\text { $\frac{\log l}{l}$ factor improvement due to binary search}
+\end{align}\par
+Let total no of comparisons for all $CR$s using efficient merging be $P=P(\max_{1\leq k\leq d}n_k)$. So $P=\sum_{i\geq 0}P'(2^i)$. Now using Eqn.\eqref{lgl}, Ineq.\eqref{p'l} and Eqn.\eqref{pl} it can be derived that $P=\sum_{i\geq 0}2^d\frac{i}{2^i}(1+i)^dN$. Therefore,
+\begin{align}
+\label{bd}
+B(d)\leq \frac{P}{N} \leq 2^{d+2}\sum\limits_{i\geq 0}\frac{i^{d+1}}{2^{i+1}}
+\end{align}
+Now as $\sum_{i\geq 0}\frac{i^{d+1}}{2^{i+1}}$ is finite, this is an ordered Bell number $b(d+1)$\cite{p18}. Using the known complexity of Bell numbers, we get
+\begin{align}
+\label{bd}
+B(d)=2^{d+2}b(d+1)=2^{d+2}\mathcal{O}((1.443)^{d+1}(d+1)!) = \mathcal{O}((2.89)^d(d+1)!)
+\end{align}

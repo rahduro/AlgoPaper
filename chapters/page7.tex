@@ -1,0 +1,31 @@
+\section{Query that fits completely in a microcube}
+Consider the example in the above picture for query $q3$, it is contained inside one microblock. Therefore, first the microblock type would be looked up from the decision tree, and then $4$ candidates indexed by $Index(t,q)$ would need to be compared to get the minimum. In a $d$-dimensional scenario, there can be upto $2^d$ candidates for comparison.
+\section{Query that crosses boundary of one or more microcubes}
+Let's consider the queries $q1$, $q2$. $q1$ crosses $1$ micro-block boundary in horizontal direction and $2$ boundaries in vertical direction. And $q2$ crosses $3$ boundaries in horizontal direction and $2$ in vertical direction. 
+Now the process of answering such a query in the general case can be described as the following,
+\compress
+\begin{itemize}\topsep0pt \itemsep1pt \parskip0pt \parsep0pt
+\item Choose any one dimension where the crossing occurs. Without loss of generality consider that it is the $1^{st}$ dimension ($n_1$), Let's call the intervals $I_j=[g(j-1)+1,gj]$ where $1\leq j\leq n_1/g$. Now assume the query is $q=[x_1,x_2]\times q'$ where $q'$ is $(d-1)$-dimensional range. For the two examples let's choose dimension $1$ (horizontal). i.e. along $y$ axis.
+\item Now assume $[x_1,x_2]$ spans over the intervals $I_u,I_{u+1},\ldots,I_v$, therefore we can divide the query into three parts $q_1=(I_u\cap[x_1,x_2])\times q'$, $q_2=(I_v\cap[x_1,x_2])\times q'$ and $q_3=(\cup_{u<w<v}I_w)\times q'$ where $u=\ceil*{\frac{x_1}{g}}$ and $v=\ceil*{\frac{x_2}{g}}$. And the query $q$ can be answered by taking union of these three. In the example, for $q1$ $u=2,v=3$ and for $q2$ $u=1,v=4$.
+\item The following $(d-1)$-dimensional array needs to be precomputed by aggregation.
+\begin{align}
+\label{a'}
+A'_{k,x}(i_1,\ldots ,i_k,i_{k+1},\ldots, i_d)=\min_{x\leq i_k	\leq g\ceil*{\frac{x}{g}}} A(i_1,\ldots,i_d) \text{ where } 1\leq k\leq d, x\in [1,n_k]
+\end{align}
+This simply computes and stores the results of every $(d-1)$-dimensional subarray where the range of indices of the fixed dimension ($k$) are all suffix of a corresponding micro-block ($\ceil*{\frac{x}{g}}$) along that dimension. This in someway is kind of similar to $RightMin$ for the case of $1D$. Now a query like $q_1$ can be answered from the above because $\min A[q_1]=A'_{1,x_1}[q']$. This would give us the min for red regions in query $q1$ and $q2$.
+\item Similarly the following structure needs to be precomputed which can answer a query like $q_2$
+\begin{align}
+\label{a''}
+A''_{k,x}(i_1,\ldots ,i_k,i_{k+1},\ldots, i_d)=\min_{g(\ceil*{\frac{x}{g}}-1)+1\leq i_k	\leq x} A(i_1,\ldots,i_d) \text{ where } 1\leq k\leq d, x\in [1,n_k]
+\end{align}
+This simply computes and stores the results of every $(d-1)$-dimensional subarray where the range of indices of the fixed dimension ($k$) are all prefix of a corresponding micro-block ($\ceil*{\frac{x}{g}}-1$) along that dimension. This in someway is kind of similar to $LeftMin$ for the case of $1D$. This would give us the min for blue regions in query $q1$ and $q2$.
+\item The $(d-1)$-dimensional structures in \eqref{a'} and \eqref{a''} needs to be recursively preprocessed
+\item To efficiently answer a query like $q_3$ which covers one or multiple full-sized intervals across some dimension one needs to pre-aggregate the array $A^*_1=\frac{n_1}{g}\times n_2\times\ldots\times n_d$ and preprcoss it using a technique mentioned in next lemma \ref{dim}. The pre-aggregation in general can be done like the following.
+\[A^*_k(i_1,\dots,i_{k-1},i^*_k,i_{k+1},\ldots i_d)=\min_{g(i^*_k-1)+1\leq i_k\leq gi^*_k}A(i_1,i_2,\dots,i_d) \text{ for } 1\leq k\leq d\]
+This is a \emph{\bf Macro Data Structure} that computes and stores aggregatead result of subarrays spanning over multiple micro-blocks (exact boundaries) along a particular dimension. Now answering $q_3$ on $A$ is equivalent to answer $[x^*_1,x^*_2]\times q'$ on $A^*_1$ where $x^*_1=\ceil*{\frac{x_1}{g}}$ and $x^*_2=\ceil*{\frac{x_2}{g}}$. In the above example the green region of $q2$ can be answered by this. The query $q1$ do not have such a part therefore only $q_1$ and $q_2$ is enough to answer $q1$.
+\end{itemize}
+\begin{lemma}
+\label{dim}
+For any fixed d, there is an algorithm to preprocess a $d$-dimensional array using $\mathcal{O}(N(3\log\log N)d)$ time and space (in words), and answer the range minimum query in $\mathcal{O}(3^d)$ time.
+\end{lemma}
+\emph{Proof:} The min operator fits is in semigroup model. For the 1-dimensional case, Yao \cite{p17} presented an algorithm to preprocess an array using $\mathcal{O}(n\log\log n)$ time and $\mathcal{O}(n\log\log n)$ space (in terms of semigroup elements) to support range sum query, where the query is answered by summing $3$ semigroup elements. Using this as a base scheme in the dimension reduction algorithm of Chazelle and Rosenberg\cite{p3}, we get an $\mathcal{O}(N(3\log\log N)d)$ time and space preprocessing algorithm to support $\mathcal{O}(3^d)$-time range semigroup sum query. Their algorithms can be implemented in the RAM model without changing the complexities.

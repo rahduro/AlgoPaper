@@ -1,0 +1,34 @@
+\section{1D RMQ: Preprocessing}
+Let us consider an input array $A$ of size $[1 \ldots n]$. The preprocessing stage 
+recursively divides the array $A$ into two sets of canonical intervals until the interval size becomes one. In this way we will get $2^i$ canonical intervals at the $i^{th}$ division stage and a total of $2n-1$ intervals.
+For each canonical interval $I$, the following data structures are constructed:
+\begin{center}
+$LeftMin(I,x)=\min_{i \leq x \text{ and } i \in I}A[i]$ \\
+$RightMin(I,x)=\min_{i \geq x \text{ and } i \in I}A[i]$
+\end{center}
+Computing the \emph{LeftMin} and \emph{RightMin} structures for intervals of length 1 is trivial. Now let $I_1=[a,b]$ and $I_2=[b+1,c]$ be the two neighbouring canonical intervals. The \emph{LeftMin} structure for $I=I_1 \cup I_2$ is merged from the \emph{LeftMin} structures of $I_1$ and $I_2$  as follows:
+\begin{enumerate}
+\item If $x \in I_1$, then $LeftMin(I, x)=LeftMin(I_1, x)$. This takes constant time.
+\item If $x \in I_2$ and $s=LeftMin(I_1, b)$, then a binary search of $s$ is done in \emph{LeftMin} structure of $I_2$. As the \emph{LeftMin} entries are non-increasing, $LeftMin(I, x) = s,\ \forall LeftMin(I_2, x) \geq s$ and $LeftMin(I, x) = LeftMin(I_2, x),\ \forall LeftMin(I_2, x) < s$. Hence this step takes $\left \lceil{\log_{2}(|I_2|+1)}\right \rceil$ comparisons.
+\end{enumerate}
+We can compute \emph{RightMin} structures in a similar way. In order to merge the \emph{LeftMin} and  \emph{RightMin} structures of an interval of size $l$ from the \emph{LeftMin} and  \emph{RightMin} structures its two sub intervals of size $\frac{l}{2}$, the number of comaprisons is bounded by $2 \log_{2}l$. Let $H(n)$ denote the number of comparisons used to preprocess an array of size $n$, then we have $H(1)=0$ and for $n \geq 2$ we have, $H(n)=2H(\frac{n}{2})+ 2 \log n$. Hence from the logarithmic comparison merging process, we have $H(n) \leq 4n$.
+\section{1D RMQ: Querying}
+\textbf{Na\"{\i}ve Approach:} Suppose there is a query $q=[a, b]$ on interval $I=[u, v]$ and let $SolveQuery([u, v], q)$ denote the basic procedure which returns the range minimum value in $I$. Three cases will arise:
+\begin{enumerate}
+\item Case 1: If $a=u$, $LeftMin(I, b)$ is returned; else if $b=v$, $RightMin(I, a)$ is returned.
+\item Case 2: If $I_1$ and $I_2$ are two canonical intervals split from $I$ and $q \subset I_1$, then recursively invoke \emph{SolveQuery($I_1$, q)}; else if $q \subset I_2$, then recursively invoke \emph{SolveQuery($I_2$, q)}.
+\item Case 3: If $q$ overlaps between $I_1$ and $I_2$, then $q$ contains right boundary of $I_1$ and left boundary of $I_2$, hence range minimum value is $= \min \{ RightMin(I_1, a), LeftMin(I_2, b) \}$.
+\end{enumerate}
+Although Case 1 and Case 3 takes $0$ and $1$ comparisons respectively, Case 2 is an $\mathcal{O}( \log n)$ operation where $n$ is the size of the initial input array. To bring this querying step to constant time, i.e., $O(1)$ an efficient preprocessing and querying procedure has been discussed in the following section.\par 
+\textbf{Efficient Implementation:}
+In order to achieve constant time querying, an auxillary tree $T$ is built during the preprocessing stage based on the canonical intervals. Let $I$ be a canonical interval and let $I_1$ and $I_2$ be the sub-intervals directly split from $I$. For each canonical interval $I$, there exists a node $v_I$ in $T$. Nodes $v_{I_1}$ for interval $I_1$ and $v_{I_2}$ for interval $I_2$ are put as the child nodes of $v_I$. A nearest common ancestor data structure is then constructed for tree $T$ using any of the linear time algorithms \cite{p15, p13, p16, p4}.\\
+%refer paper
+Now assume there is a query $q=[a, b]$, and let $I_1$ be the interval $[a,a]$ and $I_2$ be the interval $[b,b]$. Now if we invoke \emph{SolveQuery(I, q)} on the interval $I$ which is the nearest common ancetor interval for $I_1$ and $I_2$, then we will have $q \subset I$ and either Case 1 or Case 3 applies to \emph{SolveQuery(I, q)} in this scenario. Hence the querying time is now improved to be constant. 
+\section{2D RMQ: Preprocessing}
+Let the input array $A$ be of size $m \times n$. We need to first construct canonical intevals for the individual dimensions $[1,m]$ ($CIS_1$) and $[1,n]$ ($CIS_2$). After this step the canonical interval set \emph{CR} for \emph{A} is defined as follows:
+\begin{center}
+$CR$ = \{$I_1 \times I_2 | I_1 \in CIS_1$ and $I_2 \in CIS_2$ \} 
+\end{center}
+
+The number of canonical ranges in \emph{CR} is at most $4mn$. Now for each canonical range say $r$=$[a_1,b_1] \times [a_2,b_2]$ the following four \emph{DominanceMin} structures are computed for each entry $(x,y) \in r$.\\
+

@@ -1,0 +1,19 @@
+\begin{theorem}
+For any fixed $d$, there is an algorithm to preprocess a $d$-dimensional array using $\mathcal{O}(B(d)N)$ time and $\mathcal{O}(2^dd!N)$ additional space (in words), and answer the range minimum query in $\mathcal{O}(3^d)$ time.
+\end{theorem}
+\emph{Proof:} Let $T(N,d)$ be total time  required for preprocessing the input array. Then we have
+\begin{align}
+T(N,d)&\leq \sum\limits_{1\leq k\leq d}\big(2n_kT(\frac{N}{n_k},d-1)+\mathcal{O}(N))+\mathcal{O}(B(d)N)\nonumber & T(N,1)=\mathcal{O}(N)\nonumber &\text{ where } \prod\limits_{k=1}^dn_k = N
+\end{align}
+Let $S(N,d)$ be total extra space required for the preprocessing. Now $W$ being word size we have
+\begin{align}
+S(N,d)&\leq \sum\limits_{1\leq k\leq d}\big((2n_kS(\frac{N}{n_k},d-1)+\mathcal{O}(N))+\mathcal{O}(\frac{B(d)N}{W})\nonumber & S(N,1)= \mathcal{O}(N)\nonumber &\text{ where } \prod\limits_{k=1}^dn_k = N
+\end{align}
+And $Q(d)$ be the query time. So we have
+\begin{align}
+Q(d)&\leq 2Q(d-1) + \mathcal{O}(3^d) & Q(1)=\mathcal{O}(1)\nonumber
+\end{align}
+Using Eqn. \eqref{bd} and recursion tree technique we can solve the three recurrences to get
+\begin{align}
+T(N,d)&=\mathcal{O}(B(d)N) & S(N,d)&=\mathcal{O}(2^dd!N) & Q(d)&=\mathcal{O}(3^d)\nonumber
+\end{align}
